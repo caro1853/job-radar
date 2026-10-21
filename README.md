@@ -34,6 +34,22 @@ To add a job you found on LinkedIn or anywhere else, paste its description:
 uv run job-radar add --url <job url> --title "AI Engineer" --company "Acme" --location "Remote" < job.txt
 ```
 
+## Run it automatically on GitHub
+
+`.github/workflows/daily.yml` runs the whole pipeline at 07:00 Colombia time, Monday to Friday. To turn it on:
+
+1. In the repository, open **Settings → Secrets and variables → Actions** and add two repository secrets:
+   - `ANTHROPIC_API_KEY`: your API key.
+   - `PROFILE_YAML`: the full contents of your `profile.yaml`.
+2. Open **Actions → daily digest → Run workflow** once to test it.
+3. Each morning, open the latest run and download the `digest-…` artifact.
+
+The database of analyzed jobs is kept between runs with the Actions cache, so each day only new jobs are analyzed (and paid for). Each daily digest lists only the jobs analyzed in the last 24 hours.
+
+Privacy: secrets never show up in logs. But this repository is public, so anyone signed in to GitHub can download the digest artifacts. A digest lists jobs, scores, skill gaps and short notes on your fit; it doesn't contain your CV. If you don't want it visible, run the workflow from a private copy of this repository.
+
+## Run it on your own computer
+
 To run it every morning, add a cron job (Linux/macOS) or a Task Scheduler task (Windows):
 
 ```

@@ -1,0 +1,60 @@
+name: daily digest
+
+# Fetches new jobs, scores them with Claude and publishes the digest as a
+# run artifact. Runs at 07:00 Colombia time (12:00 UTC), Monday to Friday.
+on:
+  schedule:
+    - cron: "0 12 * * 1-5"
+  workflow_dispatch:
+
+concurrency:
+  group: daily-digest
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --locked --no-dev
+
+      - name: Write profile from secret
+        env:
+          PROFILE_YAML: ${{ secrets.PROFILE_YAML }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$PROFILE_YAML" ] || [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::Add the PROFILE_YAML and ANTHROPIC_API_KEY repository secrets first (see README)."
+            exit 1
+          fi
+          printf '%s\n' "$PROFILE_YAML" > profile.yaml
+
+      # The database remembers which jobs were already analyzed, so each run
+      # only pays for new ones. Each run saves a new cache entry and restores
+      # the latest one.
+      - name: Restore job database
+        uses: actions/cache/restore@v4
+        with:
+          path: job_radar.db
+          key: job-radar-db-${{ github.run_id }}
+          restore-keys: job-radar-db-
+
+      - name: Fetch, analyze and write the digest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run job-radar run --limit 50 --days 1
+
+      - name: Save job database
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: job_radar.db
+          key: job-radar-db-${{ github.run_id }}
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ github.run_number }}
+          path: digests/
+          retention-days: 14

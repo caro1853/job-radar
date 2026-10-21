@@ -6,7 +6,7 @@ import argparse
 import hashlib
 import logging
 import sys
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import httpx
@@ -88,7 +88,10 @@ def cmd_analyze(args, store: db.Store, profile: Profile) -> None:
 
 
 def cmd_digest(args, store: db.Store, profile: Profile) -> None:
-    ranked = digest.rank(store.analyzed(), min_score=args.min_score, include_unclear=not args.strict)
+    since = None
+    if args.days:
+        since = (datetime.now(timezone.utc) - timedelta(days=args.days)).isoformat(timespec="seconds")
+    ranked = digest.rank(store.analyzed(since=since), min_score=args.min_score, include_unclear=not args.strict)
     out = Path(args.out_dir) / f"{date.today().isoformat()}.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(digest.render(ranked), encoding="utf-8")
@@ -151,6 +154,7 @@ def build_parser() -> argparse.ArgumentParser:
     def with_digest(sp):
         sp.add_argument("--min-score", type=int, default=60)
         sp.add_argument("--strict", action="store_true", help="leave out jobs whose location is unclear")
+        sp.add_argument("--days", type=float, default=None, help="only jobs analyzed in the last N days")
         sp.add_argument("--out-dir", default="digests")
 
     sp = sub.add_parser("fetch", help="download new jobs from all sources")
