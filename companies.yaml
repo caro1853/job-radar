@@ -1,0 +1,23 @@
+# Companies to watch, by the job system (ATS) they use and their board slug.
+# The slug is the last part of the company's public job board URL:
+#   job-boards.greenhouse.io/<slug>, jobs.lever.co/<slug>, jobs.ashbyhq.com/<slug>
+# These slugs were written from memory and not checked live yet. The first
+# `job-radar fetch` logs a warning for any slug that no longer works; fix or remove it.
+greenhouse:
+  anthropic: Anthropic
+  scaleai: Scale AI
+  databricks: Databricks
+  vercel: Vercel
+  gitlab: GitLab
+lever:
+  mistral: Mistral AI
+  palantir: Palantir
+ashby:
+  openai: OpenAI
+  cohere: Cohere
+  perplexity: Perplexity
+  elevenlabs: ElevenLabs
+  langchain: LangChain
+  replit: Replit
+remotive:
+  categories: [software-dev, ai-ml]

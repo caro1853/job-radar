@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.db
+digests/
+applications/
+profile.yaml
+.env

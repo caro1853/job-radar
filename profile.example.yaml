@@ -1,0 +1,30 @@
+# Copy this file to profile.yaml and fill it in. profile.yaml is git-ignored.
+name: Caro
+based_in: Colombia (UTC-5)
+headline: Senior backend engineer moving into AI Integration Engineering
+years_experience: 15
+skills:
+  - C#
+  - .NET
+  - ASP.NET Core
+  - SQL Server
+  - REST APIs
+  - Microservices
+  - Azure
+learning:
+  - Python
+  - LLM APIs (Claude, OpenAI)
+  - RAG
+  - Vector databases
+target_titles:
+  - AI Integration Engineer
+  - AI Engineer
+  - Applied AI Engineer
+  - Senior Backend Engineer (AI)
+  - LLM Engineer
+min_salary_usd_year: 90000
+title_keywords: [engineer, developer, architect]
+exclude_title_keywords: [intern, sales, recruiter, designer, director, manager]
+cv_text: |
+  Paste your full CV here as plain text. The more real achievements and
+  numbers it has, the better the match scores and the tailored drafts.
