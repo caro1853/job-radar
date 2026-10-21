@@ -73,11 +73,16 @@ class Store:
         )
         self.conn.commit()
 
-    def analyzed(self) -> list[tuple[Job, JobAnalysis, str | None]]:
-        """Every analyzed job with its application status (None if untouched)."""
+    def analyzed(self, since: str | None = None) -> list[tuple[Job, JobAnalysis, str | None]]:
+        """Analyzed jobs with their application status (None if untouched).
+
+        `since` (ISO 8601) keeps only jobs analyzed at or after that time.
+        """
         rows = self.conn.execute(
             "SELECT j.data, a.data, p.status FROM jobs j "
-            "JOIN analyses a ON a.uid = j.uid LEFT JOIN applications p ON p.uid = j.uid"
+            "JOIN analyses a ON a.uid = j.uid LEFT JOIN applications p ON p.uid = j.uid "
+            "WHERE a.analyzed_at >= ?",
+            (since or "",),
         ).fetchall()
         return [(Job.model_validate_json(j), JobAnalysis.model_validate_json(a), s) for j, a, s in rows]
 

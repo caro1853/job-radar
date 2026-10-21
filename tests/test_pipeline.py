@@ -118,6 +118,14 @@ def test_store_roundtrip(tmp_path):
         store.set_status("greenhouse:1", "maybe")
 
 
+def test_analyzed_since_keeps_only_recent(tmp_path):
+    store = db.Store(tmp_path / "t.db")
+    store.add_jobs([job()])
+    store.save_analysis("greenhouse:1", analysis(), "m")
+    assert len(store.analyzed(since="2000-01-01T00:00:00+00:00")) == 1
+    assert store.analyzed(since="2999-01-01T00:00:00+00:00") == []
+
+
 class FakeMessages:
     def __init__(self, response):
         self.response, self.calls = response, []
